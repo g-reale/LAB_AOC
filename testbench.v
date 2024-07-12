@@ -145,35 +145,34 @@ module testbench;
     .regbankconfig,
     .regsource
   );
-  
-  
-    initial begin
-      $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, vopA: %d, clk: %b", instruction, counter, dest, opA, opB, result, vopA, clock);  
-      // $monitor("inst: %b, opcode: %b, REGS: %b, REGT: %b, REGD: %b, SHAMFT: %b, FUNC: %b, IMMI: %b, IMMJ: %b",instruction,instruction[`OPCODE],instruction[`REGS],instruction[`REGT],instruction[`REGD],instruction[`SHAMFT],instruction[`FUNC],instruction[`IMMI],instruction[`IMMJ]);
-      // $monitor("optype: %b, deference: %b, aluop: %b, shamft: %b, pcconfig: %b, ramconfig: %b, regbankconfig: %b, regsource: %b",optype,deference,aluop,shamft,pcconfig,ramconfig,regbankconfig,regsource);
 
-      #1;
-      clock = 1;
-      clock = 0;
-      #1;
-      clock = 1;
-      clock = 0;
-      #1;
-      clock = 1;
-      clock = 0;
-      #1;
-      clock = 1;
-      clock = 0;
-      #1;
-      clock = 1;
-      clock = 0;
-      #1;
-      clock = 1;
-      clock = 0;
-      #1;
-      clock = 1;
-      clock = 0;
-      $finish;
-    end     
+  initial begin
+    $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, vopA: %d, clk: %b", instruction, counter, dest, opA, opB, result, vopA, clock);  
+    // $monitor("inst: %b, opcode: %b, REGS: %b, REGT: %b, REGD: %b, SHAMFT: %b, FUNC: %b, IMMI: %b, IMMJ: %b",instruction,instruction[`OPCODE],instruction[`REGS],instruction[`REGT],instruction[`REGD],instruction[`SHAMFT],instruction[`FUNC],instruction[`IMMI],instruction[`IMMJ]);
+    // $monitor("optype: %b, deference: %b, aluop: %b, shamft: %b, pcconfig: %b, ramconfig: %b, regbankconfig: %b, regsource: %b",optype,deference,aluop,shamft,pcconfig,ramconfig,regbankconfig,regsource);
+
+    #1;
+    clock = 1;
+    clock = 0;
+    #1;
+    clock = 1;
+    clock = 0;
+    #1;
+    clock = 1;
+    clock = 0;
+    #1;
+    clock = 1;
+    clock = 0;
+    #1;
+    clock = 1;
+    clock = 0;
+    #1;
+    clock = 1;
+    clock = 0;
+    #1;
+    clock = 1;
+    clock = 0;
+    $finish;
+  end     
 
 endmodule

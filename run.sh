@@ -1,12 +1,15 @@
 #!/bin/sh
 
-# Compile the verilog
 mkdir -p build
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-iverilog -o build/testbench *.v || { printf "${RED}Failed to compile, check errors${NC}\n"; exit 0; }
-# iverilog -E -o build/testbench *.v || { printf "${RED}Failed to compile, check errors${NC}\n"; exit 0; }
+# Call the script to expand the program inside the program_memory block
+python3 build/expandProg.py build/prog.asm program_memory.v //--program--//
+
+# Compile the verilog
+iverilog -DPROGRAM_PATH=\"prog.asm\" -E -o build/testbench.d *.v
+iverilog -DPROGRAM_PATH=\"prog.asm\" -o build/testbench *.v || { printf "${RED}Failed to compile, check errors${NC}\n"; exit 0; }
 
 # Run the simulation
 cd build
