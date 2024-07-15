@@ -3,6 +3,7 @@
 `ifndef PRECOMPILER
 `define PRECOMPILER
 
+// R INSTRUCTIONS
 `define ADD(dest,opa,opb,shamft)({6'd63, 5'd dest, 5'd opa, 5'd opb, 5'd shamft, 2'd0, `ALUADD})
 `define SUB(dest,opa,opb,shamft)({6'd63, 5'd dest, 5'd opa, 5'd opb, 5'd shamft, 2'd0, `ALUSUB})
 `define MUL(dest,opa,opb,shamft)({6'd63, 5'd dest, 5'd opa, 5'd opb, 5'd shamft, 2'd0, `ALUMUL})
@@ -16,6 +17,8 @@
 `define SLT(dest,opa,opb,shamft)({6'd63, 5'd dest, 5'd opa, 5'd opb, 5'd shamft, 2'd0, `ALUSLT})
 `define JR(opa) ({6'd63, 5'd 0, 5'd opa, 5'd 0, 5'd 0, `FUNCJR})
 `define JALR(dest,opa)({6'd63,5'd dest, 5'd opa, 5'd 0, 5'd 0, `FUNCJALR})
+
+// I INSTRUCTIONS
 `define ADDI(dest,opa,opb)({2'd0, `ALUADD, 5'd dest, 5'd opa, 16'd opb})
 `define SUBI(dest,opa,opb)({2'd0, `ALUSUB, 5'd dest, 5'd opa, 16'd opb})
 `define MULI(dest,opa,opb)({2'd0, `ALUMUL, 5'd dest, 5'd opa, 16'd opb})
@@ -34,6 +37,7 @@
 `define LOAD(dest,opa,opb)({`OPLOAD, 5'd dest, 5'd opa, 16'd opb})
 `define STORE(dest,opa,opb)({`OPSTORE,5'd dest, 5'd opa, 16'd opb})
 
+// J INSTRUCTIONS
 `define JMP(dest)({`OPJ, 26'd dest})
 `define JAL(dest)({`OPJAL, 26'd dest})
 

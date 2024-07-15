@@ -497,6 +497,22 @@ endmodule
 
 
 
+// R INSTRUCTIONS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// I INSTRUCTIONS
 
 
 
@@ -515,19 +531,7 @@ endmodule
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+// J INSTRUCTIONS
 
 
 
@@ -653,6 +657,10 @@ endmodule
 
 
 
+
+
+
+
 module program_memory(
   input wire [0:31] adr,
   output wire [0:31] instruction
@@ -662,7 +670,7 @@ module program_memory(
   
   initial begin
 //--program--//
-memory[0] = ({2'd0, 4'd0, 5'd 20, 5'd 20, 16'd 852}); 
+memory[0] = ({2'd0, 4'd0, 5'd 30, 5'd 30, 16'd 1296}); 
 memory[1] = ({2'd0, 4'd0, 5'd 31, 5'd 31, 16'd 0}); 
 memory[2] = ({6'd61, 26'd 1}); 
 //--program--//

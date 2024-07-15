@@ -1,4 +1,5 @@
 from random import randrange
+import argparse
 import subprocess 
 import re
 
@@ -28,17 +29,19 @@ while A < B:
 #ENSURES THE SHIFT AMOUNT TO BE 0 OR 1
 SHAMFT = randrange(2)
 
-
+#GLOBAL LIST THAT CONTAINS THE UNIT TESTS
 testList = []
 
 def run(program):
+    
+    #hardcoded values for now 
     with open('build/prog.asm','w') as file:
         file.write(program)
-
     result = subprocess.run(
         ['./run.sh'],
         capture_output = True
     ).stdout
+
     result = result.decode("utf8")
     result = find_numbers.findall(result)
     return [int(x) for x in result]
@@ -374,8 +377,6 @@ def testJAL():
     '''
     result = run(program)
     return answer == result[0:len(answer)], answer, result
-
-
 
 if __name__ == '__main__':
     print("PARAMETERS: ")
