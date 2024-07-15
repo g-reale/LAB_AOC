@@ -27,8 +27,8 @@ module decoder_j(input wire [0:31]instruction,
                  output wire [0:31]opA,
                  output wire [0:31]opB);
 
-    assign dest = 32'd0;
-    assign opA = -32'd2;
+    assign dest = 32'd31;
+    assign opA = 32'd0;
     assign opB = instruction[`IMMJ];
 
 endmodule

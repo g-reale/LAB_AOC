@@ -9,13 +9,9 @@ module program_memory(
   
   initial begin
 //--program--//
-memory[0] = `ADDI(1,1,3); 
-memory[1] = `MUL(1,1,1,0); 
-memory[2] = `ADDI(1,1,3); 
-memory[3] = `JMP(1); 
-memory[4] = `JMP(2); 
-memory[5] = `SUBI(1,1,10); 
-memory[6] = `ADDI(1,1,10); 
+memory[0] = `ADDI(20,20,852); 
+memory[1] = `ADDI(31,31,0); 
+memory[2] = `JAL(1); 
 //--program--//
   end
 

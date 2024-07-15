@@ -54,19 +54,19 @@ module testbench;
   wire [0:31] popB;
   register_bank registers(
     //operation decode
-    .radrA(vdest[0:4]),
-    .radrB(vopA[0:4]),
-    .radrC(vopB[0:4]),
+    .radrA(vdest[27:31]),
+    .radrB(vopA[27:31]),
+    .radrC(vopB[27:31]),
     .rvalueA(pdest),
     .rvalueB(popA),
     .rvalueC(popB),
 
     //routing to ram (store)
-    .radrD(dest[0:4]),
+    .radrD(dest[27:31]),
     .rvalueD(store),
 
     //routing from alu, ram or pc
-    .wadr(dest[0:4]),
+    .wadr(dest[27:31]),
     .wvalue(save),
     .wenable(regbankconfig),
     .clock
@@ -96,8 +96,10 @@ module testbench;
   // ROUTING RESULT TO PROGRAM COUNTER
   //fifith micro instruction: pc config (reference and step)
   wire [0:1] pcconfig;
-  wire [0:31] reference = pcconfig[0] ? result : counter;
-  wire [0:31] step = pcconfig[1] ? result : 32'd1;
+  wire [0:31] step = pcconfig[0] ? result : 
+                     pcconfig[1] ? 32'd0 :
+                     32'd1;
+  wire [0:31] reference = pcconfig[1] ? result : counter;
   
   program_counter pc(
     .reference,
@@ -128,9 +130,9 @@ module testbench;
   //seventh micro instruction: regbank config (is writing enabled or not?)
   wire regbankconfig;
   //eighth micro instruction: register bank source (will the loaded value be from the alu, ram or pc?) 
-  wire [0:1] regsource = 2'b00;
+  wire [0:1] regsource;
   wire [0:31] load;
-  wire [0:31] save = regsource == 2'd0 ? result : regsource == 2'd1 ? load : counter;
+  wire [0:31] save = regsource == `REGSRC_ALU ? result : regsource == `REGSRC_LOAD ? load : counter;
 
 
   //CONNECTING THE TORMENT NEXUS
@@ -147,31 +149,19 @@ module testbench;
   );
 
   initial begin
-    $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, vopA: %d, clk: %b", instruction, counter, dest, opA, opB, result, vopA, clock);  
+    $monitor("%d",result);
+    // $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, clk: %b", instruction, counter, dest, opA, opB, result, clock);  
+    // $monitor("pc: %d wadr: %d, wvalue: %d, wenable: %d, radr: %d, rvalue: %d",counter,result,store,ramconfig,result,load);
     // $monitor("inst: %b, opcode: %b, REGS: %b, REGT: %b, REGD: %b, SHAMFT: %b, FUNC: %b, IMMI: %b, IMMJ: %b",instruction,instruction[`OPCODE],instruction[`REGS],instruction[`REGT],instruction[`REGD],instruction[`SHAMFT],instruction[`FUNC],instruction[`IMMI],instruction[`IMMJ]);
     // $monitor("optype: %b, deference: %b, aluop: %b, shamft: %b, pcconfig: %b, ramconfig: %b, regbankconfig: %b, regsource: %b",optype,deference,aluop,shamft,pcconfig,ramconfig,regbankconfig,regsource);
 
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
+    //RUN 10 CLOCK CICLES
+    for(integer i = 0; i < 10; i++) begin
+      #1  
+      clock = 1;
+      clock = 0;
+    end
+
     $finish;
   end     
 

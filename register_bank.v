@@ -25,8 +25,9 @@ module register_bank(
   
   //sequential part
   always @(negedge clock) begin
-    if(wenable) 
+    if(wenable) begin
       registers[wadr] = wvalue;
+    end
   end
   
   //combinational part

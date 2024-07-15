@@ -20,30 +20,25 @@ module control_unit(
             optype = `I;
             shamft = 5'd0;
             
+            // ARITHIMETIC I INSTRUCTIONS
             if(opcode <= `ALUSLT) begin
                 deference       = `DEF_OPA;
-                aluop           = instruction[opcode];
+                aluop           =  opcode;
                 pcconfig        = `PC_NORMAL;
                 ramconfig       = 0;
                 regbankconfig   = 1;
                 regsource       = `REGSRC_ALU;
-
-            end else if (opcode == `OPBEQ) begin
+            
+            //BRANCH I INSTRUCTIONS
+            end else if (`OPBEQ <= opcode && opcode <= `OPBNQNEG) begin
                 deference       = `DEF_DEST | `DEF_OPA;
-                aluop           = `ALUSEQ;
+                aluop           = opcode - `OPBEQ + `ALUSEQ;
                 pcconfig        = `PCSET_STEP;
                 ramconfig       = 0;
                 regbankconfig   = 0;
                 regsource       = `REGSRC_ALU;
-
-            end else if (opcode == `OPBNQ) begin
-                deference       = `DEF_DEST | `DEF_OPA;
-                aluop           = `ALUSNQ;
-                pcconfig        = `PCSET_STEP;
-                ramconfig       = 0;
-                regbankconfig   = 0;
-                regsource       = `REGSRC_ALU;
-
+            
+            //LOAD INSTRUCTION
             end else if (opcode == `OPLOAD) begin
                 deference       = `DEF_OPA;
                 aluop           = `ALUADD;
@@ -52,6 +47,7 @@ module control_unit(
                 regbankconfig   = 1;
                 regsource       = `REGSRC_LOAD;
 
+            //STORE INSTRUCTION
             end else if (opcode == `OPSTORE) begin
                 deference       = `DEF_OPA;
                 aluop           = `ALUADD;
@@ -59,7 +55,6 @@ module control_unit(
                 ramconfig       = 1;
                 regbankconfig   = 0;
                 regsource       = `REGSRC_ALU;
-
             end
 
         end else if(`IS_J_OPCODE(opcode)) begin
@@ -67,6 +62,7 @@ module control_unit(
             optype = `J;
             shamft = 5'd0;
 
+            //JUMP INSTRUCTION
             if(instruction[`OPCODE] == `OPJ) begin
                 deference       = 3'b000;
                 aluop           = `ALUADD;
@@ -75,6 +71,7 @@ module control_unit(
                 regbankconfig   = 0;
                 regsource       = `REGSRC_ALU;
 
+            //JUMP AND LINK INSTRUCTION
             end if(instruction[`OPCODE] == `OPJAL) begin
                 deference       = 3'b000;
                 aluop           = `ALUADD;
@@ -89,6 +86,7 @@ module control_unit(
             optype = `R;
             shamft = instruction[`SHAMFT];
 
+            //ARITHMETIC R INSTRUCTIONS
             if(instruction[`FUNC] <= `ALUSLT) begin
                 deference       = `DEF_OPA | `DEF_OPB;
                 aluop           = instruction[`FUNC];
@@ -97,16 +95,18 @@ module control_unit(
                 regbankconfig   = 1;
                 regsource       = `REGSRC_ALU;
 
+            //JUMP REGISTER INSTRUCTION
             end else if(instruction[`FUNC] == `FUNCJR) begin
-                deference       = `DEF_DEST;
+                deference       = `DEF_OPA;
                 aluop           = `ALUADD;
                 pcconfig        = `PCSET_REF;
                 ramconfig       = 0;
                 regbankconfig   = 0;
                 regsource       = `REGSRC_ALU;
 
+            //JUMP AND LINK REGISTER INSTRUCTION
             end else if(instruction[`FUNC] == `FUNCJALR) begin
-                deference       = `DEF_DEST;
+                deference       = `DEF_OPA;
                 aluop           = `ALUADD;
                 pcconfig        = `PCSET_REF;
                 ramconfig       = 0;

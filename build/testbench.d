@@ -35,8 +35,6 @@
 
 
 
-//MACROS FOR THE R TYPE FUNCS 
-
 
 
 //MACROS FOR THE J AND I TYPE OPCODES
@@ -44,6 +42,12 @@
 
 
 
+
+
+
+
+
+//MACROS FOR THE R TYPE FUNCS 
 
 
 
@@ -68,21 +72,32 @@ module arithmetic_logic_unit(
         output wire [0:31]result   
     );
 
-    assign result = (operation == 4'd0) ? (opA + opB) << shamft :
-                    (operation == 4'd1) ? (opA - opB) << shamft :
-                    (operation == 4'd3) ? (opA * opB) << shamft :
-                    (operation == 4'd4) ? (opA / opB) << shamft :
-                    (operation == 4'd5) ? (opA & opB) << shamft :
-                    (operation == 4'd7) ? (~(opA | opB)) << shamft :
-                    (operation == 4'd8) ? (opA ^ opB) << shamft :
-                    (operation == 4'd9) ? (opA << opB) << shamft :
-                    (operation == 4'd10) ? (opA >> opB) << shamft :
-                    (operation == 4'd11) ? (opA < opB) << shamft:
-                    (operation == 4'd12) ? (opC == opA) ? opB : 32'd1 :
-                    (operation == 4'd13) ? (opC != opA) ? opB : 32'd1 :
+    assign result = (operation == 4'd0)    ? (opA + opB) << shamft :
+                    (operation == 4'd1)    ? (opA - opB) << shamft :
+                    (operation == 4'd2)    ? (opA * opB) << shamft :
+                    (operation == 4'd3)    ? (opA / opB) << shamft :
+                    (operation == 4'd4)    ? (opA & opB) << shamft :
+                    (operation == 4'd5)     ? (opA | opB) << shamft :
+                    (operation == 4'd6)    ? (~(opA | opB)) << shamft :
+                    (operation == 4'd7)    ? (opA ^ opB) << shamft :
+                    (operation == 4'd8)    ? (opA << opB) << shamft :
+                    (operation == 4'd9)    ? (opA >> opB) << shamft :
+                    (operation == 4'd10)    ? (opA < opB) << shamft:
+                    (operation == 4'd11)    ? (opC == opA) ? opB : 32'd1 :
+                    (operation == 4'd12)    ? (opC != opA) ? opB : 32'd1 :
+                    (operation == 4'd13) ? (opC == opA) ? -opB : 32'd1 :
+                    (operation == 4'd14) ? (opC != opA) ? -opB : 32'd1 :
                     0;
 
 endmodule
+
+
+
+
+
+
+
+
 
 
 
@@ -218,36 +233,31 @@ module control_unit(
     wire [0:5]opcode = instruction[0:5];
     
     always @* begin
-        if((6'd0 <= opcode && opcode <= 6'd15)) begin
+        if((6'd0 <= opcode && opcode <= 6'd18)) begin
             
             optype = 2'd0;
             shamft = 5'd0;
             
-            if(opcode <= 4'd11) begin
+            // ARITHIMETIC I INSTRUCTIONS
+            if(opcode <= 4'd10) begin
                 deference       = 3'b010;
-                aluop           = instruction[opcode];
+                aluop           =  opcode;
                 pcconfig        = 2'b00;
                 ramconfig       = 0;
                 regbankconfig   = 1;
                 regsource       = 2'd0;
-
-            end else if (opcode == 6'd12) begin
+            
+            //BRANCH I INSTRUCTIONS
+            end else if (6'd13 <= opcode && opcode <= 6'd16) begin
                 deference       = 3'b100 | 3'b010;
-                aluop           = 4'd12;
+                aluop           = opcode - 6'd13 + 4'd11;
                 pcconfig        = 2'b10;
                 ramconfig       = 0;
                 regbankconfig   = 0;
                 regsource       = 2'd0;
-
-            end else if (opcode == 6'd13) begin
-                deference       = 3'b100 | 3'b010;
-                aluop           = 4'd13;
-                pcconfig        = 2'b10;
-                ramconfig       = 0;
-                regbankconfig   = 0;
-                regsource       = 2'd0;
-
-            end else if (opcode == 6'd14) begin
+            
+            //LOAD INSTRUCTION
+            end else if (opcode == 6'd17) begin
                 deference       = 3'b010;
                 aluop           = 4'd0;
                 pcconfig        = 2'b00;
@@ -255,22 +265,23 @@ module control_unit(
                 regbankconfig   = 1;
                 regsource       = 2'd1;
 
-            end else if (opcode == 6'd15) begin
+            //STORE INSTRUCTION
+            end else if (opcode == 6'd18) begin
                 deference       = 3'b010;
                 aluop           = 4'd0;
                 pcconfig        = 2'b00;
                 ramconfig       = 1;
                 regbankconfig   = 0;
                 regsource       = 2'd0;
-
             end
 
-        end else if((61'd0 <= opcode && opcode <= 6'd62)) begin
+        end else if((6'd60 <= opcode && opcode <= 6'd61)) begin
 
             optype = 2'd1;
             shamft = 5'd0;
 
-            if(instruction[0:5] == 6'd61) begin
+            //JUMP INSTRUCTION
+            if(instruction[0:5] == 6'd60) begin
                 deference       = 3'b000;
                 aluop           = 4'd0;
                 pcconfig        = 2'b01;
@@ -278,7 +289,8 @@ module control_unit(
                 regbankconfig   = 0;
                 regsource       = 2'd0;
 
-            end if(instruction[0:5] == 6'd62) begin
+            //JUMP AND LINK INSTRUCTION
+            end if(instruction[0:5] == 6'd61) begin
                 deference       = 3'b000;
                 aluop           = 4'd0;
                 pcconfig        = 2'b01;
@@ -292,7 +304,8 @@ module control_unit(
             optype = 2'd2;
             shamft = instruction[21:25];
 
-            if(instruction[26:31] <= 4'd11) begin
+            //ARITHMETIC R INSTRUCTIONS
+            if(instruction[26:31] <= 4'd10) begin
                 deference       = 3'b010 | 3'b001;
                 aluop           = instruction[26:31];
                 pcconfig        = 2'b00;
@@ -300,16 +313,18 @@ module control_unit(
                 regbankconfig   = 1;
                 regsource       = 2'd0;
 
+            //JUMP REGISTER INSTRUCTION
             end else if(instruction[26:31] == 6'd62) begin
-                deference       = 3'b100;
+                deference       = 3'b010;
                 aluop           = 4'd0;
                 pcconfig        = 2'b01;
                 ramconfig       = 0;
                 regbankconfig   = 0;
                 regsource       = 2'd0;
 
+            //JUMP AND LINK REGISTER INSTRUCTION
             end else if(instruction[26:31] == 6'd63) begin
-                deference       = 3'b100;
+                deference       = 3'b010;
                 aluop           = 4'd0;
                 pcconfig        = 2'b01;
                 ramconfig       = 0;
@@ -319,6 +334,10 @@ module control_unit(
         end
     end
 endmodule
+
+
+
+
 
 
 
@@ -406,11 +425,16 @@ module decoder_j(input wire [0:31]instruction,
                  output wire [0:31]opA,
                  output wire [0:31]opB);
 
-    assign dest = 32'd0;
-    assign opA = -32'd2;
+    assign dest = 32'd31;
+    assign opA = 32'd0;
     assign opB = instruction[6:31];
 
 endmodule
+
+
+
+
+
 
 
 
@@ -624,6 +648,11 @@ endmodule
 
 
 
+
+
+
+
+
 module program_memory(
   input wire [0:31] adr,
   output wire [0:31] instruction
@@ -633,13 +662,9 @@ module program_memory(
   
   initial begin
 //--program--//
-memory[0] = ({2'd0, 4'd0, 5'd 1, 5'd 1, 16'd 3}); 
-memory[1] = ({6'd63, 5'd 1, 5'd 1, 5'd 1, 5'd 0, 2'd0, 4'd3}); 
-memory[2] = ({2'd0, 4'd0, 5'd 1, 5'd 1, 16'd 3}); 
-memory[3] = ({6'd61, 26'd 1}); 
-memory[4] = ({6'd61, 26'd 2}); 
-memory[5] = ({2'd0, 4'd1, 5'd 1, 5'd 1, 16'd 10}); 
-memory[6] = ({2'd0, 4'd0, 5'd 1, 5'd 1, 16'd 10}); 
+memory[0] = ({2'd0, 4'd0, 5'd 20, 5'd 20, 16'd 852}); 
+memory[1] = ({2'd0, 4'd0, 5'd 31, 5'd 31, 16'd 0}); 
+memory[2] = ({6'd61, 26'd 1}); 
 //--program--//
   end
 
@@ -655,17 +680,25 @@ endmodulemodule random_acess_memory(
   input wire clock
 );
 
-  reg [0:31] memory [0:(1<<32)-1];
+  //CHANGE RAM SIZE WHEN SYTHESIZING TO THE TARGET PLATAFORM
+  //THE COMPILED PROGRAM WON'T WORK IF THE RAM IS TOO BIG
+  parameter RAM_SIZE = 4096;
+  reg [0:31] memory [0:RAM_SIZE];
+
+  initial begin
+    for(integer i = 0; i < RAM_SIZE; i++)
+      memory[i] = 0;
+  end
 
   //sequential part
   always @(negedge clock)begin
-    if(wenable)
+    if(wenable) begin
       memory[wadr] = wvalue;
+    end
   end
 
   //combinational part
   assign rvalue = memory[radr]; 
-  
 endmodulemodule register_bank(
   input wire [0:4]radrA,
   input wire [0:4]radrB,
@@ -693,8 +726,9 @@ endmodulemodule register_bank(
   
   //sequential part
   always @(negedge clock) begin
-    if(wenable) 
+    if(wenable) begin
       registers[wadr] = wvalue;
+    end
   end
   
   //combinational part
@@ -704,6 +738,10 @@ endmodulemodule register_bank(
   assign rvalueD = registers[radrD];
   
 endmodule
+
+
+
+
 
 
 
@@ -818,19 +856,19 @@ module testbench;
   wire [0:31] popB;
   register_bank registers(
     //operation decode
-    .radrA(vdest[0:4]),
-    .radrB(vopA[0:4]),
-    .radrC(vopB[0:4]),
+    .radrA(vdest[27:31]),
+    .radrB(vopA[27:31]),
+    .radrC(vopB[27:31]),
     .rvalueA(pdest),
     .rvalueB(popA),
     .rvalueC(popB),
 
     //routing to ram (store)
-    .radrD(dest[0:4]),
+    .radrD(dest[27:31]),
     .rvalueD(store),
 
     //routing from alu, ram or pc
-    .wadr(dest[0:4]),
+    .wadr(dest[27:31]),
     .wvalue(save),
     .wenable(regbankconfig),
     .clock
@@ -860,8 +898,10 @@ module testbench;
   // ROUTING RESULT TO PROGRAM COUNTER
   //fifith micro instruction: pc config (reference and step)
   wire [0:1] pcconfig;
-  wire [0:31] reference = pcconfig[0] ? result : counter;
-  wire [0:31] step = pcconfig[1] ? result : 32'd1;
+  wire [0:31] step = pcconfig[0] ? result : 
+                     pcconfig[1] ? 32'd0 :
+                     32'd1;
+  wire [0:31] reference = pcconfig[1] ? result : counter;
   
   program_counter pc(
     .reference,
@@ -892,7 +932,7 @@ module testbench;
   //seventh micro instruction: regbank config (is writing enabled or not?)
   wire regbankconfig;
   //eighth micro instruction: register bank source (will the loaded value be from the alu, ram or pc?) 
-  wire [0:1] regsource = 2'b00;
+  wire [0:1] regsource;
   wire [0:31] load;
   wire [0:31] save = regsource == 2'd0 ? result : regsource == 2'd1 ? load : counter;
 
@@ -911,31 +951,19 @@ module testbench;
   );
 
   initial begin
-    $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, vopA: %d, clk: %b", instruction, counter, dest, opA, opB, result, vopA, clock);  
+    $monitor("%d",result);
+    // $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, clk: %b", instruction, counter, dest, opA, opB, result, clock);  
+    // $monitor("pc: %d wadr: %d, wvalue: %d, wenable: %d, radr: %d, rvalue: %d",counter,result,store,ramconfig,result,load);
     // $monitor("inst: %b, opcode: %b, REGS: %b, REGT: %b, REGD: %b, SHAMFT: %b, FUNC: %b, IMMI: %b, IMMJ: %b",instruction,instruction[`OPCODE],instruction[`REGS],instruction[`REGT],instruction[`REGD],instruction[`SHAMFT],instruction[`FUNC],instruction[`IMMI],instruction[`IMMJ]);
     // $monitor("optype: %b, deference: %b, aluop: %b, shamft: %b, pcconfig: %b, ramconfig: %b, regbankconfig: %b, regsource: %b",optype,deference,aluop,shamft,pcconfig,ramconfig,regbankconfig,regsource);
 
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
-    #1;
-    clock = 1;
-    clock = 0;
+    //RUN 10 CLOCK CICLES
+    for(integer i = 0; i < 10; i++) begin
+      #1  
+      clock = 1;
+      clock = 0;
+    end
+
     $finish;
   end     
 

@@ -9,8 +9,7 @@ parser.add_argument('body_marker',type=str)
 args = parser.parse_args()
 
 #REGEXES FOR TEXT PROCESSING
-find_instruction = re.compile(r'(^[A-Z]*\((\d*,?)*\);)$',re.MULTILINE)
-# find_program_body = re.compile(r'\/\/--program--\/\/(\n|.)*\/\/--program--\/\/',re.MULTILINE)
+find_instruction = re.compile(r'^ *([A-Z]*\((\d*,?)*\);)$',re.MULTILINE)
 find_program_body = re.compile(fr'{args.body_marker}(\n|.)*{args.body_marker}',re.MULTILINE)
 
 #OPENING THE INPUT PROGRAM FILE
