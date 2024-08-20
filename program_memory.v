@@ -9,7 +9,7 @@ module program_memory(
   
   initial begin
 //--program--//
-memory[0] = `ADDI(30,30,1296); 
+memory[0] = `ADDI(28,28,1601); 
 memory[1] = `ADDI(31,31,0); 
 memory[2] = `JAL(1); 
 //--program--//

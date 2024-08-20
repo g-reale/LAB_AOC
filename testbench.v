@@ -48,7 +48,6 @@ module testbench;
   wire [0:31]vopA = optype == `I ? opAi : optype == `J ? opAj : opAr; 
   wire [0:31]vopB = optype == `I ? opBi : optype == `J ? opBj : opBr;
 
-  //second micro instruction: choose argument deference
   wire [0:31] pdest;
   wire [0:31] popA;
   wire [0:31] popB;
@@ -72,14 +71,15 @@ module testbench;
     .clock
   );
   
+  //second micro instruction: choose argument deference
   wire [0:2] deference;
   wire [0:31] dest = deference[0] ? pdest : vdest;
   wire [0:31] opA = deference [1] ? popA : vopA;
   wire [0:31] opB = deference [2] ? popB : vopB;
-
-  // EXECUTING CALCULATIONS
+  
   //third micro instruction: choose aluop
   wire [0:3] aluop;
+  
   //fourth micro instruction: choose shift amount
   wire [0:5] shamft;
 
@@ -93,13 +93,12 @@ module testbench;
     .result
   );
 
-  // ROUTING RESULT TO PROGRAM COUNTER
   //fifith micro instruction: pc config (reference and step)
   wire [0:1] pcconfig;
+  wire [0:31] reference = pcconfig[1] ? result : counter;
   wire [0:31] step = pcconfig[0] ? result : 
                      pcconfig[1] ? 32'd0 :
                      32'd1;
-  wire [0:31] reference = pcconfig[1] ? result : counter;
   
   program_counter pc(
     .reference,
@@ -108,10 +107,10 @@ module testbench;
     .clock
   );
 
-  //ROUTING RESULT TO RAM (STORE)
   //sixth micro instruction: ram config (is writing enabled or not?)
   wire ramconfig;
   wire [0:31] store;
+
   random_acess_memory ram(
     //writing on ram (store)
     .wadr(result),
@@ -123,37 +122,31 @@ module testbench;
     .rvalue(load),
     .clock
   );
-
-  //ROUTING RESULT FROM RAM TO REG BANK (LOAD)
-  //ROUTING RESULT FROM ALU TO REG BANK (CALCULATION)
-  //ROUTING REUSLT FROM PC TO REG BANK (JUMP AND LINK)
+  
   //seventh micro instruction: regbank config (is writing enabled or not?)
   wire regbankconfig;
+  
   //eighth micro instruction: register bank source (will the loaded value be from the alu, ram or pc?) 
   wire [0:1] regsource;
   wire [0:31] load;
   wire [0:31] save = regsource == `REGSRC_ALU ? result : regsource == `REGSRC_LOAD ? load : counter;
 
 
-  //CONNECTING THE TORMENT NEXUS
   control_unit cu(
     .instruction,
-    .optype,
-    .deference,
-    .aluop,
-    .shamft,
-    .pcconfig,
-    .ramconfig,
-    .regbankconfig,
-    .regsource
+    .optype,          // processes the operation type (I - J - R)
+    .deference,       // chosses witch instruction arguments should be dereferenced on the register bank
+    .aluop,           // chooses the aluoperation for the specific instruction
+    .shamft,          // chooses the shiftamount for the specific instruction
+    .pcconfig,        // chooses the pc mode (normal - change reference - change step)
+    .ramconfig,       // enables/disables writing on the ram
+    .regbankconfig,   // enables/disables writing on the regbank
+    .regsource        // chooses the source of what shall be writen on the register bank (alu - ram - pc)
   );
 
+  //TESTTING ROUTINE 
   initial begin
     $monitor("%d",result);
-    // $monitor("instruction: %b, pc: %d, dest: %d, opA: %d, opB: %d, result: %d, clk: %b", instruction, counter, dest, opA, opB, result, clock);  
-    // $monitor("pc: %d wadr: %d, wvalue: %d, wenable: %d, radr: %d, rvalue: %d",counter,result,store,ramconfig,result,load);
-    // $monitor("inst: %b, opcode: %b, REGS: %b, REGT: %b, REGD: %b, SHAMFT: %b, FUNC: %b, IMMI: %b, IMMJ: %b",instruction,instruction[`OPCODE],instruction[`REGS],instruction[`REGT],instruction[`REGD],instruction[`SHAMFT],instruction[`FUNC],instruction[`IMMI],instruction[`IMMJ]);
-    // $monitor("optype: %b, deference: %b, aluop: %b, shamft: %b, pcconfig: %b, ramconfig: %b, regbankconfig: %b, regsource: %b",optype,deference,aluop,shamft,pcconfig,ramconfig,regbankconfig,regsource);
 
     //RUN 10 CLOCK CICLES
     for(integer i = 0; i < 10; i++) begin
