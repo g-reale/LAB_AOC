@@ -1,3 +1,4 @@
+
 module register_bank(
   input wire [0:4]radrA,
   input wire [0:4]radrB,
@@ -9,20 +10,23 @@ module register_bank(
   output wire[0:31]rvalueB,
   output wire[0:31]rvalueC,
   output wire[0:31]rvalueD,
-  output wire[0:31]wvalue,
 
+  input wire[0:31]wvalue,
   input wire wenable,
   input wire clock
 );
 
   reg [0:31] registers [0:31];
   //memory initialized to 0
-  initial begin
-      for(integer i = 0; i < 32; i = i + 1) begin
-          registers[i] <= 32'd0;
-      end
-  end
   
+  `ifdef UNIT_TESTING
+    initial begin
+        for(integer i = 0; i < 32; i = i + 1) begin
+            registers[i] <= 32'd0;
+        end
+    end
+  `endif
+
   //sequential part
   always @(negedge clock) begin
     if(wenable) begin

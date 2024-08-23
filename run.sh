@@ -7,12 +7,12 @@ NC='\033[0m' # No Color
 python3 build/expandProg.py build/prog.asm program_memory.v //--program--//
 
 # Compile the verilog
-iverilog -DPROGRAM_PATH=\"prog.asm\" -E -o build/testbench.d *.v
-iverilog -DPROGRAM_PATH=\"prog.asm\" -o build/testbench *.v || { printf "${RED}Failed to compile, check errors${NC}\n"; exit 0; }
+iverilog -g2009 -DUNIT_TESTING -E  -o build/processor.d *.v
+iverilog -g2009 -DUNIT_TESTING -o  build/processor *.v || { printf "${RED}Failed to compile, check errors${NC}\n"; exit 0; }
 
 # Run the simulation
 cd build
-./testbench || { printf "${RED}Failed to run simulation, check errors${NC}\n"; exit 0; }
+./processor || { printf "${RED}Failed to run simulation, check errors${NC}\n"; exit 0; }
 
 # Check if GTK wave is already running
 # WID=$(cat gtkwave)

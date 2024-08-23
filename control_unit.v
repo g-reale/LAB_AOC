@@ -1,3 +1,4 @@
+
 `include "constants.v"
 
 module control_unit(
@@ -23,7 +24,7 @@ module control_unit(
             // ARITHIMETIC I INSTRUCTIONS
             if(opcode <= `ALUSLT) begin
                 deference       = `DEF_OPA;
-                aluop           =  opcode;
+                aluop           =  opcode[0:3];
                 pcconfig        = `PC_NORMAL;
                 ramconfig       = 0;
                 regbankconfig   = 1;
@@ -32,7 +33,7 @@ module control_unit(
             //BRANCH I INSTRUCTIONS
             end else if (`OPBEQ <= opcode && opcode <= `OPBNQNEG) begin
                 deference       = `DEF_DEST | `DEF_OPA;
-                aluop           = opcode - `OPBEQ + `ALUSEQ;
+                aluop           = (opcode - `OPBEQ + `ALUSEQ);
                 pcconfig        = `PCSET_STEP;
                 ramconfig       = 0;
                 regbankconfig   = 0;

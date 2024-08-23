@@ -1,3 +1,4 @@
+
 `include "precompiler.v"
 
 module program_memory(
@@ -7,13 +8,12 @@ module program_memory(
   parameter memsize = ((1<<16) - 1); 
   reg [0:31] memory [0:memsize];
   
-  initial begin
 //--program--//
-memory[0] = `ADDI(28,28,1601); 
-memory[1] = `ADDI(31,31,0); 
-memory[2] = `JAL(1); 
+assign memory[0] = `SUB(0,0,0,0); 
+assign memory[1] = `ADDI(0,0,4095); 
+assign memory[2] = `STORE(0,0,0); 
+assign memory[3] = `JMP(2); 
 //--program--//
-  end
 
   assign instruction = memory[adr];
 endmodule

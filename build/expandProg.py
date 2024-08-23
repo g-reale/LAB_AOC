@@ -18,7 +18,7 @@ with open(args.program_path,"r") as file:
     program = file.read()
 
 #EXTRACTIONG AND FORMATING THE INSTRUCTIONS
-instructions = ''.join(f'memory[{index}] = `{instruction[0]} \n' 
+instructions = ''.join(f'assign memory[{index}] = `{instruction[0]} \n' 
                        for index,instruction in 
                        enumerate(find_instruction.findall(program)))
 instructions = args.body_marker + '\n' + instructions[:-1] + '\n' + args.body_marker

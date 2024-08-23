@@ -61,4 +61,10 @@
 `define REGSRC_ALU  2'd0
 `define REGSRC_LOAD 2'd1
 `define REGSRC_PC   2'd2
+
+//MACROS FOR RAM AND MAGICAL ADRESSES
+`define RAM_SIZE (32'd4096)
+`define IS_NOT_MAGICAL(adr)(adr < (`RAM_SIZE - 1))
+`define MGC_DISP_ADR (`RAM_SIZE - 1)
+`define MGC_SWCH_ADR (`RAM_SIZE - 1)
 `endif

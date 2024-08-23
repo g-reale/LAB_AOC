@@ -1,3 +1,4 @@
+
 module random_acess_memory(
   input wire [0:31] radr,
   input wire [0:31] wadr,
@@ -5,27 +6,43 @@ module random_acess_memory(
   output wire [0:31] rvalue,
   input wire [0:31] wvalue,
 
+  //peripherals
+  output wire [0:6] displays[0:7],
+  input wire [0:17] switches,
+
   input wire wenable,
   input wire clock
 );
 
-  //CHANGE RAM SIZE WHEN SYTHESIZING TO THE TARGET PLATAFORM
-  //THE COMPILED PROGRAM WON'T WORK IF THE RAM IS TOO BIG
-  parameter RAM_SIZE = 4096;
-  reg [0:31] memory [0:RAM_SIZE];
+  reg [0:31] memory [0:`RAM_SIZE];
 
-  initial begin
-    for(integer i = 0; i < RAM_SIZE; i++)
-      memory[i] = 0;
-  end
+  `ifdef UNIT_TESTING
+    initial begin
+      for(integer i = 0; i < `RAM_SIZE; i++)
+        memory[i] = 0;
+    end
+  `endif
 
+  reg [0:31] to_display = 0;
+  seven_segment_decoder ss_dec(
+    .number(to_display),
+    .displays
+  );
+  
   //sequential part
   always @(negedge clock)begin
+    
     if(wenable) begin
-      memory[wadr] = wvalue;
+      if(`IS_NOT_MAGICAL(wadr))  //write to main memory
+        memory[wadr] = wvalue;
+      else if(wadr == `MGC_DISP_ADR) //write to display
+        to_display = wvalue;
     end
   end
 
   //combinational part
-  assign rvalue = memory[radr]; 
+  assign rvalue = `IS_NOT_MAGICAL(wadr) ? memory[radr] : //read from main memory
+                  wadr == `MGC_SWCH_ADR ? switches :     //read from switches
+                  32'd0; 
+
 endmodule
